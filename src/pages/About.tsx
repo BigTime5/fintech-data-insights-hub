@@ -85,7 +85,7 @@ const About = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-primary rounded-lg opacity-20 animate-glow"></div>
                 <img
-                  src="/lovable-uploads/339565af-8a3d-4736-b990-0b7a918d863e.png"
+                  src="uploads/339565af-8a3d-4736-b990-0b7a918d863e.png"
                   alt="Phinidy George - Professional Photo"
                   className="relative w-80 h-96 object-cover rounded-lg shadow-card border-2 border-white/20"
                 />

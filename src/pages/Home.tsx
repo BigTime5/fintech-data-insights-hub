@@ -94,7 +94,7 @@ const Home = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-primary rounded-full opacity-20 animate-glow"></div>
                 <img
-                  src="/lovable-uploads/339565af-8a3d-4736-b990-0b7a918d863e.png"
+                  src="uploads/339565af-8a3d-4736-b990-0b7a918d863e.png"
                   alt="Phinidy George - Fintech CPA and Data Scientist"
                   className="relative w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-full shadow-card border-4 border-white/20"
                 />
