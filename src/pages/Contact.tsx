@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+
 import { 
   Mail, 
   Phone, 
@@ -14,11 +14,14 @@ import {
   Github, 
   BookOpen,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Send,
+  ExternalLink
 } from "lucide-react";
 
 const Contact = () => {
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,19 +30,115 @@ const Contact = () => {
     message: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
+    setIsSubmitting(true);
+
+    try {
+      // Option 1: Send email using mailto (opens user's email client)
+      const subject = encodeURIComponent(`Contact Form: ${formData.service || 'General Inquiry'}`);
+      const body = encodeURIComponent(`
+Name: ${formData.name}
+Email: ${formData.email}
+Company: ${formData.company || 'Not specified'}
+Service Interest: ${formData.service || 'General Inquiry'}
+
+Message:
+${formData.message}
+      `);
+      
+      const mailtoLink = `mailto:phinidygeorge01@gmail.com?subject=${subject}&body=${body}`;
+      window.open(mailtoLink, '_blank');
+
+      // Option 2: You could also integrate with a service like EmailJS, Formspree, or Netlify Forms
+      // Here's an example with a mock API call:
+      /*
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+      */
+
+      toast({
+        title: "Message Prepared!",
+        description: "Your email client should open with the pre-filled message. If not, please email me directly at phinidygeorge01@gmail.com",
+      });
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        service: "",
+        message: ""
+      });
+
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was an issue preparing your message. Please try again or email me directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleScheduleMeeting = () => {
+    // Option 1: Direct Calendly link (if you have one)
+    // window.open('https://calendly.com/your-username/30min', '_blank');
+
+    // Option 2: Google Calendar appointment scheduling
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 1); // Tomorrow
+    startDate.setHours(10, 0, 0, 0); // 10 AM
+    
+    const endDate = new Date(startDate);
+    endDate.setMinutes(30); // 30-minute meeting
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Consultation with Phinidy George')}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent('30-minute discovery call to discuss your project needs and how I can help with fintech CPA and data science solutions.')}&location=${encodeURIComponent('Video Call (Link to be provided)')}&sf=true&output=xml`;
+    
+    window.open(googleCalendarUrl, '_blank');
+
+    // Option 3: Open email to schedule
+    const subject = encodeURIComponent('Schedule Consultation Meeting');
+    const body = encodeURIComponent(`Hi Phinidy,
+
+I would like to schedule a 30-minute consultation to discuss my project needs.
+
+My preferred times are:
+- [Please specify your preferred dates and times]
+- [Alternative option 1]
+- [Alternative option 2]
+
+My timezone: [Your timezone]
+
+Looking forward to hearing from you!
+
+Best regards,
+[Your name]`);
+    
+    const mailtoLink = `mailto:phinidygeorge01@gmail.com?subject=${subject}&body=${body}`;
+    
+    // Show user options
+    const userChoice = confirm("Choose how to schedule:\n\nOK = Open Google Calendar to create event\nCancel = Send scheduling email");
+    
+    if (userChoice) {
+      window.open(googleCalendarUrl, '_blank');
+    } else {
+      window.open(mailtoLink, '_blank');
+    }
+
     toast({
-      title: "Message Sent!",
-      description: "Thank you for your inquiry. I'll get back to you within 24 hours.",
-    });
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      service: "",
-      message: ""
+      title: "Meeting Scheduler Opened",
+      description: "Choose your preferred method to schedule our consultation.",
     });
   };
 
@@ -127,7 +226,7 @@ const Contact = () => {
                 Send Me a Message
               </h2>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="name">Full Name *</Label>
@@ -138,6 +237,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       placeholder="Your full name"
+                      className="mt-1"
                     />
                   </div>
                   <div>
@@ -149,6 +249,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                       placeholder="your.email@company.com"
+                      className="mt-1"
                     />
                   </div>
                 </div>
@@ -162,6 +263,7 @@ const Contact = () => {
                       value={formData.company}
                       onChange={(e) => setFormData({...formData, company: e.target.value})}
                       placeholder="Your company name"
+                      className="mt-1"
                     />
                   </div>
                   <div>
@@ -191,11 +293,26 @@ const Contact = () => {
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
                     placeholder="Tell me about your project, goals, and how I can help you..."
                     rows={6}
+                    className="mt-1"
                   />
                 </div>
                 
-                <Button type="submit" variant="hero" size="lg" className="w-full">
-                  Send Message
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Preparing Message...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      Send Message
+                    </>
+                  )}
                 </Button>
               </form>
             </Card>
@@ -268,7 +385,11 @@ const Contact = () => {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button 
+                  onClick={handleScheduleMeeting}
+                  className="w-full bg-card text-primary border border-border hover:bg-muted transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
                   Schedule Meeting
                 </Button>
               </Card>

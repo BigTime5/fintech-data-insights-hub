@@ -8,10 +8,82 @@ import {
   TrendingUp, 
   DollarSign, 
   Users,
-  ArrowRight
+  ArrowRight,
+  Check,
+  AlertCircle
 } from "lucide-react";
+import { useState } from "react";
 
 const Blog = () => {
+  const [email, setEmail] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      setSubscriptionStatus("error");
+      setTimeout(() => setSubscriptionStatus(""), 3000);
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setSubscriptionStatus("invalid");
+      setTimeout(() => setSubscriptionStatus(""), 3000);
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call - replace with your actual newsletter service
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Here you would typically send the email to your newsletter service
+      // Example: await fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ email }) })
+      
+      setSubscriptionStatus("success");
+      setEmail("");
+      setTimeout(() => setSubscriptionStatus(""), 5000);
+    } catch (error) {
+      setSubscriptionStatus("error");
+      setTimeout(() => setSubscriptionStatus(""), 3000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getStatusMessage = () => {
+    switch (subscriptionStatus) {
+      case "success":
+        return {
+          message: "Successfully subscribed! Check your email for confirmation.",
+          icon: <Check className="h-4 w-4" />,
+          className: "text-green-600 bg-green-50 border-green-200"
+        };
+      case "error":
+        return {
+          message: "Please enter a valid email address.",
+          icon: <AlertCircle className="h-4 w-4" />,
+          className: "text-red-600 bg-red-50 border-red-200"
+        };
+      case "invalid":
+        return {
+          message: "Please enter a valid email format.",
+          icon: <AlertCircle className="h-4 w-4" />,
+          className: "text-orange-600 bg-orange-50 border-orange-200"
+        };
+      default:
+        return null;
+    }
+  };
+
   const featuredArticles = [
     {
       title: "13 Ruthlessly Effective Wealth-Building Principles",
@@ -76,6 +148,8 @@ const Blog = () => {
       category: "Entrepreneurship"
     }
   ];
+
+  const statusMessage = getStatusMessage();
 
   return (
     <div className="min-h-screen pt-16">
@@ -206,15 +280,41 @@ const Blog = () => {
               and wealth-building strategies delivered to your inbox.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg border border-white/20 bg-white/10 text-primary-foreground placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-              <Button variant="cta" size="lg">
-                Subscribe
-              </Button>
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-3 rounded-lg border border-white/20 bg-white/10 text-primary-foreground placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200"
+                  disabled={isLoading}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubscribe(e)}
+                />
+                <Button 
+                  variant="cta" 
+                  size="lg" 
+                  onClick={handleSubscribe}
+                  disabled={isLoading}
+                  className="min-w-[120px]"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
+                      Subscribing...
+                    </div>
+                  ) : (
+                    "Subscribe"
+                  )}
+                </Button>
+              </div>
+
+              {statusMessage && (
+                <div className={`p-3 rounded-lg border flex items-center justify-center gap-2 max-w-md mx-auto ${statusMessage.className}`}>
+                  {statusMessage.icon}
+                  <span className="text-sm font-medium">{statusMessage.message}</span>
+                </div>
+              )}
             </div>
             
             <p className="text-sm text-gray-300 mt-4">
