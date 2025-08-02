@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   BarChart3, 
   Brain, 
@@ -16,6 +16,24 @@ import {
 } from "lucide-react";
 
 const Services = () => {
+  const navigate = useNavigate();
+
+  // Function to handle smooth scrolling to sections
+  const scrollToSection = (sectionId: string, fallbackRoute?: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+      // Update URL without page reload
+      window.history.replaceState(null, '', fallbackRoute || `/${sectionId}`);
+    } else if (fallbackRoute) {
+      // If section doesn't exist, navigate to the route
+      navigate(fallbackRoute);
+    }
+  };
+
   const mainServices = [
     {
       icon: BarChart3,
@@ -132,13 +150,15 @@ const Services = () => {
             <span className="text-accent block">Services</span>
           </h1>
           <p className="text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
-            Specialized solutions that combine deep financial expertise with cutting-edge 
-            data science to transform your business operations and drive growth.
+            I deliver specialized solutions that fuse CPA precision with advanced data science- transforming operations, optimizing compliance, 
+            and accelerating growth across today's dynamic financial landscape.
           </p>
-          <Button variant="cta" size="xl" asChild>
-            <Link to="/contact">
-              Schedule Consultation <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+          <Button 
+            variant="cta" 
+            size="xl" 
+            onClick={() => scrollToSection('contact', '/contact')}
+          >
+            Schedule Consultation <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </section>
@@ -265,11 +285,20 @@ const Services = () => {
             can transform your business.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="cta" size="xl" asChild>
-              <Link to="/contact">Get Started Today</Link>
+            <Button 
+              variant="cta" 
+              size="xl" 
+              onClick={() => scrollToSection('contact', '/contact')}
+            >
+              Get Started Today
             </Button>
-            <Button variant="outline" size="xl" className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/20" asChild>
-              <Link to="/portfolio">View Case Studies</Link>
+            <Button 
+              variant="outline" 
+              size="xl" 
+              className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/20"
+              onClick={() => scrollToSection('portfolio', '/portfolio')}
+            >
+              View Case Studies
             </Button>
           </div>
         </div>

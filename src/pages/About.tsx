@@ -67,12 +67,12 @@ const About = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl lg:text-5xl font-bold text-primary-foreground mb-6">
-                Bridging Finance & Technology Through
-                <span className="text-accent block">Data-Driven Innovation</span>
+                Reimaging Financial Futures with 
+                <span className="text-accent block">Intelligence and Impact</span>
               </h1>
               <p className="text-xl text-gray-200 mb-8">
-                With a unique combination of CPA expertise and advanced data science skills, 
-                I help fintech companies transform their financial operations through intelligent automation and predictive analytics.
+                I fuse CPA expertise with data science precision to help fintech companies evolve- from reactive accounting to predictive, AI-powered finance. 
+                Through intelligent automation and advance analytics, I architect  financial ecosystems that scale, comply, and outperform.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Badge variant="secondary" className="px-4 py-2">CPA Certified</Badge>
@@ -187,9 +187,7 @@ const About = () => {
             My Mission
           </h2>
           <p className="text-xl text-gray-200 mb-8 max-w-4xl mx-auto">
-            To democratize advanced financial analytics by making sophisticated data science 
-            accessible to fintech companies of all sizes. I believe that every financial decision 
-            should be backed by data-driven insights, and I'm committed to making that vision a reality.
+            To empower decision-makers with tools that scale, systems that adapt, and insights that convert complexity into clarity.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             <div className="text-center">

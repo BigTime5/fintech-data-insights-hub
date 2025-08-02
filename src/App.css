@@ -1,19 +1,15 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
+/* Preserve existing logo animations and card styles if needed */
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -39,4 +35,141 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* NEW STYLES FOR DUAL NAVIGATION SYSTEM */
+
+/* Root styles - Remove max-width and centering to allow full-width sections */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left; /* Changed from center to left for better content alignment */
+}
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reset default margins and padding */
+* {
+  box-sizing: border-box;
+}
+
+/* Main content container */
+.main-content {
+  width: 100%;
+}
+
+/* Section styling - Each section is a full experience */
+.section-container {
+  min-height: 100vh; /* Each section takes at least full viewport height */
+  width: 100%;
+  padding: 80px 0 40px 0; /* Top padding for fixed nav, bottom for breathing room */
+  position: relative;
+  display: flex;
+  align-items: center; /* Center content vertically */
+}
+
+/* Content wrapper within each section */
+.section-content {
+  width: 100%;
+  max-width: 1280px; /* Match your original max-width */
+  margin: 0 auto;
+  padding: 0 2rem; /* Match your original padding */
+}
+
+/* Visual separation between sections - subtle divider */
+.section-container:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, hsl(var(--border)), transparent);
+}
+
+/* Scroll indicator styling */
+.scroll-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Smooth scroll offset for navigation links */
+section[id] {
+  scroll-margin-top: 80px; /* Adjust based on your navigation height */
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .section-container {
+    min-height: 100vh;
+    padding: 100px 0 40px 0; /* More top padding for mobile nav */
+  }
+  
+  .section-content {
+    padding: 0 1rem; /* Smaller padding on mobile */
+  }
+  
+  section[id] {
+    scroll-margin-top: 100px;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .section-container {
+    padding: 90px 0 40px 0;
+  }
+}
+
+/* Enhanced smooth scrolling for better UX */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  .section-container {
+    transition: opacity 0.6s ease-in-out;
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .scroll-indicator svg {
+    animation: none !important;
+  }
+}
+
+/* Ensure footer doesn't interfere with sections */
+footer {
+  position: relative;
+  z-index: 10;
+}
+
+/* Optional: Add some visual polish */
+.section-container:nth-child(even) {
+  background: hsl(var(--muted) / 0.3); /* Very subtle alternating background */
+}
+
+/* Ensure content within sections isn't constrained by the old root styles */
+.section-content > * {
+  max-width: none; /* Override any max-width constraints */
 }

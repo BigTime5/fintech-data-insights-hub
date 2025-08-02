@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,24 @@ import {
 } from "lucide-react";
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  // Function to handle smooth scrolling to sections
+  const scrollToSection = (sectionId: string, fallbackRoute?: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+      // Update URL without page reload
+      window.history.replaceState(null, '', fallbackRoute || `/${sectionId}`);
+    } else if (fallbackRoute) {
+      // If section doesn't exist, navigate to the route
+      navigate(fallbackRoute);
+    }
+  };
+
   const services = [
     {
       icon: BarChart3,
@@ -39,7 +57,7 @@ const Home = () => {
   ];
 
   const stats = [
-    { number: "50+", label: "Projects Completed", icon: Target },
+    { number: "20+", label: "Projects Completed", icon: Target },
     { number: "89%", label: "ML Model Accuracy", icon: Brain },
     { number: "$500K+", label: "Cost Savings Generated", icon: TrendingUp },
     { number: "24/7", label: "Real-time Monitoring", icon: BarChart3 }
@@ -69,23 +87,29 @@ const Home = () => {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
-                Transforming Finance Through
-                <span className="text-accent block">Data-Driven Insights</span>
+                Where AI-driven insights meet
+                <span className="text-accent block">financial mastery</span>
               </h1>
               
               <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto lg:mx-0">
-                Bridging traditional accounting with cutting-edge data science to deliver 
-                innovative fintech solutions that drive growth and efficiency.
+                Reshaping how fintech companies scale, comply, and compete globally. Data is the blueprint. Strategy is the outcome.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button variant="cta" size="xl" asChild>
-                  <Link to="/contact">
-                    Get Started <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
+                <Button 
+                  variant="cta" 
+                  size="xl" 
+                  onClick={() => scrollToSection('contact', '/contact')}
+                >
+                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button variant="outline" size="xl" className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/20" asChild>
-                  <Link to="/portfolio">View Portfolio</Link>
+                <Button 
+                  variant="outline" 
+                  size="xl" 
+                  className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/20"
+                  onClick={() => scrollToSection('portfolio', '/portfolio')}
+                >
+                  View Portfolio
                 </Button>
               </div>
             </div>
@@ -124,11 +148,10 @@ const Home = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-              Fintech CPA & Data Science Services
+              Strategic Finance & Data Intelligence for Fintech Leaders
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Specialized solutions that combine financial expertise with advanced analytics 
-              to transform your business operations.
+              Where accounting meets algorithms. Where data becomes strategy. I build financial solutions that perform, predict and scale.
             </p>
           </div>
           
@@ -143,8 +166,12 @@ const Home = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button variant="hero" size="lg" asChild>
-              <Link to="/services">Explore All Services</Link>
+            <Button 
+              variant="hero" 
+              size="lg" 
+              onClick={() => scrollToSection('services', '/services')}
+            >
+              Explore All Services
             </Button>
           </div>
         </div>
@@ -180,11 +207,20 @@ const Home = () => {
             Let's discuss how data-driven financial solutions can accelerate your business growth.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="cta" size="xl" asChild>
-              <Link to="/contact">Schedule Consultation</Link>
+            <Button 
+              variant="cta" 
+              size="xl" 
+              onClick={() => scrollToSection('contact', '/contact')}
+            >
+              Schedule Consultation
             </Button>
-            <Button variant="outline" size="xl" className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/20" asChild>
-              <Link to="/portfolio">View Case Studies</Link>
+            <Button 
+              variant="outline" 
+              size="xl" 
+              className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/20"
+              onClick={() => scrollToSection('portfolio', '/portfolio')}
+            >
+              View Case Studies
             </Button>
           </div>
         </div>
