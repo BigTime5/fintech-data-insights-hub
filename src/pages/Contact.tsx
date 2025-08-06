@@ -22,6 +22,11 @@ import {
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
+  const showToast = (title, description, variant = "default") => {
+    setToast({ title, description, variant });
+    setTimeout(() => setToast(null), 5000);
+  };
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,48 +35,175 @@ const Contact = () => {
     message: ""
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Option 1: Send email using mailto (opens user's email client)
-      const subject = encodeURIComponent(`Contact Form: ${formData.service || 'General Inquiry'}`);
-      const body = encodeURIComponent(`
-Name: ${formData.name}
-Email: ${formData.email}
-Company: ${formData.company || 'Not specified'}
-Service Interest: ${formData.service || 'General Inquiry'}
+      const emailData = {
+        to: 'phinidygeorge01@gmail.com',
+        subject: `Contact Form: ${formData.service || 'General Inquiry'}`,
+        body: `
+Hello Phinidy,
 
-Message:
+I am interested in your services and would like to discuss my project.
+
+CONTACT DETAILS:
+- Name: ${formData.name}
+- Email: ${formData.email}
+- Company: ${formData.company || 'Not specified'}
+- Service Interest: ${formData.service || 'General Inquiry'}
+
+PROJECT DETAILS:
 ${formData.message}
-      `);
-      
-      const mailtoLink = `mailto:phinidygeorge01@gmail.com?subject=${subject}&body=${body}`;
-      window.open(mailtoLink, '_blank');
 
-      // Option 2: You could also integrate with a service like EmailJS, Formspree, or Netlify Forms
-      // Here's an example with a mock API call:
-      /*
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+Please let me know your availability for a consultation.
 
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-      */
+Best regards,
+${formData.name}
+        `
+      };
 
-      toast({
-        title: "Message Prepared!",
-        description: "Your email client should open with the pre-filled message. If not, please email me directly at phinidygeorge01@gmail.com",
-      });
+      // Create a modal with multiple options
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md mx-4">
+          <h3 class="text-lg font-bold mb-4">Send Your Message</h3>
+          <p class="text-gray-600 mb-4">Choose how you'd like to send your message:</p>
+          <div class="space-y-3">
+            <button id="tryEmail" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+              📧 Try Email Client
+            </button>
+            <button id="copyEmail" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700">
+              📋 Copy Email Details
+            </button>
+            <button id="openGmail" class="w-full bg-red-600 text-white p-3 rounded-lg hover:bg-red-700">
+              🌐 Open Gmail Web
+            </button>
+            <button id="showDetails" class="w-full bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700">
+              📝 Show Contact Details
+            </button>
+            <button id="closeModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded-lg hover:bg-gray-400">
+              Cancel
+            </button>
+          </div>
+        </div>
+      `;
 
-      // Reset form
+      document.body.appendChild(modal);
+
+      // Handle each option
+      (modal.querySelector('#tryEmail') as HTMLElement).onclick = () => {
+        const subject = encodeURIComponent(emailData.subject);
+        const body = encodeURIComponent(emailData.body);
+        const mailtoLink = `mailto:${emailData.to}?subject=${subject}&body=${body}`;
+        
+        try {
+          window.open(mailtoLink, '_blank');
+          showToast("Email Client Opening", "If nothing opened, try another option below.");
+        } catch (error) {
+          showToast("Email Client Failed", "Please try copying the details instead.", "destructive");
+        }
+        document.body.removeChild(modal);
+      };
+
+      (modal.querySelector('#copyEmail') as HTMLElement).onclick = async () => {
+        const emailText = `
+To: ${emailData.to}
+Subject: ${emailData.subject}
+
+${emailData.body}
+        `;
+        
+        try {
+          await navigator.clipboard.writeText(emailText);
+          showToast("Email Copied!", "Email details copied to clipboard. Paste into your email app.");
+        } catch (error) {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = emailText;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          showToast("Email Copied!", "Email details copied. Paste into your email app.");
+        }
+        document.body.removeChild(modal);
+      };
+
+      (modal.querySelector('#openGmail') as HTMLElement).onclick = () => {
+        const subject = encodeURIComponent(emailData.subject);
+        const body = encodeURIComponent(emailData.body);
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${emailData.to}&su=${subject}&body=${body}`;
+        
+        window.open(gmailUrl, '_blank');
+        showToast("Gmail Opened", "Gmail compose window should open in new tab.");
+        document.body.removeChild(modal);
+      };
+
+      (modal.querySelector('#showDetails') as HTMLElement).onclick = () => {
+        document.body.removeChild(modal);
+        
+        // Show details in a new modal
+        const detailsModal = document.createElement('div');
+        detailsModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        detailsModal.innerHTML = `
+          <div class="bg-white p-6 rounded-lg shadow-xl max-w-lg mx-4">
+            <h3 class="text-lg font-bold mb-4">Your Contact Details</h3>
+            <div class="bg-gray-50 p-4 rounded-lg text-sm">
+              <p><strong>Send to:</strong> ${emailData.to}</p>
+              <p><strong>Subject:</strong> ${emailData.subject}</p>
+              <div class="mt-3">
+                <strong>Message:</strong>
+                <pre class="whitespace-pre-wrap mt-2">${emailData.body}</pre>
+              </div>
+            </div>
+            <div class="mt-4 space-y-2">
+              <button id="copyDetails" class="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700">
+                Copy All Details
+              </button>
+              <button id="closeDetails" class="w-full bg-gray-300 text-gray-800 p-2 rounded-lg hover:bg-gray-400">
+                Close
+              </button>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(detailsModal);
+        
+        (detailsModal.querySelector('#copyDetails') as HTMLElement).onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(`To: ${emailData.to}\nSubject: ${emailData.subject}\n\n${emailData.body}`);
+            showToast("Details Copied!", "All details copied to clipboard.");
+          } catch (error) {
+            showToast("Copy manually", "Please copy the details manually from above.");
+          }
+          document.body.removeChild(detailsModal);
+        };
+        
+        (detailsModal.querySelector('#closeDetails') as HTMLElement).onclick = () => {
+          document.body.removeChild(detailsModal);
+        };
+        
+        detailsModal.onclick = (e) => {
+          if (e.target === detailsModal) {
+            document.body.removeChild(detailsModal);
+          }
+        };
+      };
+
+      (modal.querySelector('#closeModal') as HTMLElement).onclick = () => {
+        document.body.removeChild(modal);
+      };
+
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          document.body.removeChild(modal);
+        }
+      };
+
+      // Reset form after showing options
       setFormData({
         name: "",
         email: "",
@@ -81,65 +213,148 @@ ${formData.message}
       });
 
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was an issue preparing your message. Please try again or email me directly.",
-        variant: "destructive",
-      });
+      showToast(
+        "Please Email Directly",
+        `Please email phinidygeorge01@gmail.com directly with your inquiry.`,
+        "destructive"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleScheduleMeeting = () => {
-    // Option 1: Direct Calendly link (if you have one)
-    // window.open('https://calendly.com/your-username/30min', '_blank');
-
-    // Option 2: Google Calendar appointment scheduling
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() + 1); // Tomorrow
-    startDate.setHours(10, 0, 0, 0); // 10 AM
+    // Create a more specific calendar event
+    const clientName = formData.name || "Potential Client";
+    const clientEmail = formData.email || "";
     
-    const endDate = new Date(startDate);
-    endDate.setMinutes(30); // 30-minute meeting
+    // Set meeting for next business day at 10 AM
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    // If it's weekend, schedule for Monday
+    if (tomorrow.getDay() === 6) tomorrow.setDate(tomorrow.getDate() + 2); // Saturday -> Monday
+    if (tomorrow.getDay() === 0) tomorrow.setDate(tomorrow.getDate() + 1); // Sunday -> Monday
     
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Consultation with Phinidy George')}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent('30-minute discovery call to discuss your project needs and how I can help with fintech CPA and data science solutions.')}&location=${encodeURIComponent('Video Call (Link to be provided)')}&sf=true&output=xml`;
-    
-    window.open(googleCalendarUrl, '_blank');
+    tomorrow.setHours(10, 0, 0, 0);
+    const endTime = new Date(tomorrow);
+    endTime.setMinutes(30);
 
-    // Option 3: Open email to schedule
-    const subject = encodeURIComponent('Schedule Consultation Meeting');
-    const body = encodeURIComponent(`Hi Phinidy,
+    const eventTitle = encodeURIComponent(`Consultation with ${clientName}`);
+    const eventDetails = encodeURIComponent(`
+Consultation meeting with ${clientName}
+Email: ${clientEmail}
+Service Interest: ${formData.service || 'General Discussion'}
 
-I would like to schedule a 30-minute consultation to discuss my project needs.
+Meeting Link: [To be provided by Phinidy]
 
-My preferred times are:
-- [Please specify your preferred dates and times]
-- [Alternative option 1]
-- [Alternative option 2]
+Agenda:
+- Project overview and requirements
+- Service discussion
+- Next steps
+    `);
 
-My timezone: [Your timezone]
+    // Method 1: More specific Google Calendar link
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${tomorrow.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${eventDetails}&location=Video+Call&sf=true&output=xml`;
 
-Looking forward to hearing from you!
+    // Method 2: Email to schedule with more details
+    const scheduleEmailSubject = encodeURIComponent(`Meeting Request: ${clientName} - ${formData.service || 'Consultation'}`);
+    const scheduleEmailBody = encodeURIComponent(`
+Hello Phinidy,
+
+I would like to schedule a consultation meeting.
+
+CLIENT INFORMATION:
+- Name: ${clientName}
+- Email: ${clientEmail}
+- Company: ${formData.company || 'Not specified'}
+- Service Interest: ${formData.service || 'General Consultation'}
+
+PREFERRED MEETING TIMES (Please choose one):
+- Option 1: ${tomorrow.toLocaleDateString()} at 10:00 AM
+- Option 2: ${new Date(tomorrow.getTime() + 24*60*60*1000).toLocaleDateString()} at 10:00 AM  
+- Option 3: ${new Date(tomorrow.getTime() + 48*60*60*1000).toLocaleDateString()} at 10:00 AM
+
+PROJECT DETAILS:
+${formData.message || 'To be discussed during the meeting'}
+
+My timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}
+
+Please confirm the meeting time and provide the video call link.
+
+Looking forward to our discussion!
 
 Best regards,
-[Your name]`);
-    
-    const mailtoLink = `mailto:phinidygeorge01@gmail.com?subject=${subject}&body=${body}`;
-    
-    // Show user options
-    const userChoice = confirm("Choose how to schedule:\n\nOK = Open Google Calendar to create event\nCancel = Send scheduling email");
-    
-    if (userChoice) {
-      window.open(googleCalendarUrl, '_blank');
-    } else {
-      window.open(mailtoLink, '_blank');
-    }
+${clientName}
+    `);
 
-    toast({
-      title: "Meeting Scheduler Opened",
-      description: "Choose your preferred method to schedule our consultation.",
-    });
+    const scheduleMailtoLink = `mailto:phinidygeorge01@gmail.com?subject=${scheduleEmailSubject}&body=${scheduleEmailBody}`;
+
+    // Give user better options
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+      <div class="bg-white p-6 rounded-lg shadow-xl max-w-md mx-4">
+        <h3 class="text-lg font-bold mb-4">Choose Scheduling Method</h3>
+        <p class="text-gray-600 mb-4">How would you like to schedule the meeting?</p>
+        <div class="space-y-3">
+          <button id="emailSchedule" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+            📧 Send Email Request (Recommended)
+          </button>
+          <button id="calendarAdd" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700">
+            📅 Add to My Calendar
+          </button>
+          <button id="copyDetails" class="w-full bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700">
+            📋 Copy Meeting Details
+          </button>
+          <button id="closeModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded-lg hover:bg-gray-400">
+            Cancel
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Handle modal button clicks
+    (modal.querySelector('#emailSchedule') as HTMLElement).onclick = () => {
+      window.open(scheduleMailtoLink, '_blank');
+      document.body.removeChild(modal);
+      showToast("Scheduling Email Opened", "Please send the email to confirm your meeting request.");
+    };
+
+    (modal.querySelector('#calendarAdd') as HTMLElement).onclick = () => {
+      window.open(googleCalendarUrl, '_blank');
+      document.body.removeChild(modal);
+      showToast("Calendar Opened", "Add this to your calendar. Remember to email Phinidy to confirm!");
+    };
+
+    (modal.querySelector('#copyDetails') as HTMLElement).onclick = async () => {
+      const meetingDetails = `
+Meeting Request Details:
+- Client: ${clientName}
+- Email: ${clientEmail}  
+- Service: ${formData.service || 'General Consultation'}
+- Proposed Time: ${tomorrow.toLocaleDateString()} at 10:00 AM
+- Duration: 30 minutes
+- Contact: phinidygeorge01@gmail.com
+      `;
+      
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(meetingDetails);
+      }
+      document.body.removeChild(modal);
+      showToast("Details Copied", "Meeting details copied to clipboard. Email phinidygeorge01@gmail.com to schedule.");
+    };
+
+    (modal.querySelector('#closeModal') as HTMLElement).onclick = () => {
+      document.body.removeChild(modal);
+    };
+
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    };
   };
 
   const contactInfo = [
@@ -202,6 +417,30 @@ Best regards,
 
   return (
     <div className="min-h-screen pt-16">
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 max-w-sm">
+          <div className={`p-4 rounded-lg shadow-lg border ${
+            toast.variant === 'destructive' 
+              ? 'bg-red-50 border-red-200 text-red-800' 
+              : 'bg-green-50 border-green-200 text-green-800'
+          }`}>
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="font-semibold text-sm">{toast.title}</h4>
+                <p className="text-sm mt-1 opacity-90">{toast.description}</p>
+              </div>
+              <button 
+                onClick={() => setToast(null)}
+                className="ml-4 text-lg leading-none opacity-70 hover:opacity-100"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="py-20 bg-gradient-hero">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
