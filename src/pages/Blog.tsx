@@ -28,7 +28,7 @@ const Blog = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisibleElements(prev => new Set([...prev, entry.target.dataset.animate]));
+            setVisibleElements(prev => new Set([...prev, (entry.target as HTMLElement).dataset.animate]));
           }
         });
       },
@@ -171,7 +171,7 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen pt-16">
-      <style jsx>{`
+      <style>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
